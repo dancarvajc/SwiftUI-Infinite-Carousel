@@ -11,11 +11,11 @@ https://user-images.githubusercontent.com/71818002/183007353-7f6cce02-1c81-40c8-
 - Infinite elements
 - Custom transitions beetwen pages
 - Timer to display a number of seconds per element
-- iOS +14 compatibility.
+- iOS +14 compatibility
 
 ## Install
 
-### Swift Package manager
+### Swift Package Manager
 
 ```
 https://github.com/dancarvajc/SwiftUIInfiniteCarousel.git
