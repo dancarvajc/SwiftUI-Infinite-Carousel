@@ -15,6 +15,7 @@ public struct InfiniteCarousel<Content: View, T: Any>: View {
     @State private var timer: Timer.TimerPublisher
     @State private var cancellable: Cancellable?
     @State private var selectedTab: Int = 1
+    @State private var isScaleEnabled: Bool = true
     private let data: [T]
     private let seconds: Double
     private let content: (T) -> Content
@@ -61,7 +62,7 @@ public struct InfiniteCarousel<Content: View, T: Any>: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .rotation3DEffect(transition == .rotation3D ? getRotation(positionMinX) : .degrees(0), axis: (x: 0, y: 1, z: 0))
                         .opacity(transition == .opacity ? getValue(positionMinX) : 1)
-                        .scaleEffect(transition == .scale ? getValue(positionMinX) : 1)
+                        .scaleEffect(isScaleEnabled && transition == .scale ? getValue(positionMinX) : 1)
                         .padding(.horizontal, horizontalPadding)
                         .onChange(of: positionMinX) { offset in
                             // If the user change the position of a banner, the offset is different of 0, so we stop the timer
@@ -105,6 +106,10 @@ public struct InfiniteCarousel<Content: View, T: Any>: View {
         }
         .onAppear {
            startTimer()
+            isScaleEnabled = true
+        }
+        .onWillDisappear {
+            isScaleEnabled = false
         }
         .onReceive(timer) { _ in
             withAnimation {
@@ -160,13 +165,28 @@ public enum TransitionType {
     case rotation3D, scale, opacity
 }
 
+struct TestView: View {
+    @State private var isActive: Bool = false
+    var body: some View {
+        NavigationView {
+            VStack {
+                InfiniteCarousel(data: ["Element 1", "Element 2", "Element 3", "Element 4"]) { element in
+                    Text(element)
+                        .font(.title.bold())
+                        .padding()
+                        .background(Color.green)
+                }
+                NavigationLink(destination: Text("Next screen"), isActive: $isActive) {
+                    Button("Go to next screen") {
+                        isActive = true
+                    }
+                }
+            }
+        }
+    }
+}
 struct InfiniteCarousel_Previews: PreviewProvider {
     static var previews: some View {
-        InfiniteCarousel(data: ["Element 1", "Element 2", "Element 3", "Element 4"]) { element in
-            Text(element)
-                .font(.title.bold())
-                .padding()
-                .background(Color.green)
-        }
+        TestView()
     }
 }
